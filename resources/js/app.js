@@ -1,28 +1,20 @@
 require('./bootstrap');
 
-(async() =>{
-	await axios.get('/sanctum/csrf-cookie').then((resp)=>{
-		console.log(resp)
-	})
+import { createApp, h } from 'vue';
+import { createInertiaApp } from '@inertiajs/inertia-vue3';
+import { InertiaProgress } from '@inertiajs/progress';
 
-	await axios.get('/login').then((resp)=>{
-		console.log(resp)
-	})
+const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
+createInertiaApp({
+    title: (title) => `${title} - ${appName}`,
+    resolve: (name) => require(`./Pages/${name}.vue`),
+    setup({ el, app, props, plugin }) {
+        return createApp({ render: () => h(app, props) })
+            .use(plugin)
+            .mixin({ methods: { route } })
+            .mount(el);
+    },
+});
 
-	await axios.get('/users').then((res)=>{
-		console.log(res)
-	});
-
-	await axios.get('/api/user').then((res)=>{
-		console.log(res)
-	});
-	// await axios.get('/logout').then((res)=>{
-	// 	console.log(res)
-	// });
-
-
-})()
-
-
-
+InertiaProgress.init({ color: '#4B5563' });

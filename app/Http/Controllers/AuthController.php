@@ -36,7 +36,7 @@ class AuthController extends Controller
         
     }
 
-    public function logout(){
+    public function logout(Request $request){
         // auth()->user()->tokens()->delete();
         // Auth::guard('web')->logout();
         // return response(['message'=>'Deslogado com sucesso']);
@@ -46,6 +46,10 @@ class AuthController extends Controller
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+
+        return response()->json([
+            'message'=>'Volte novamente!'
+        ], 200);
     }
 
     public function register(Request $request){
@@ -60,7 +64,13 @@ class AuthController extends Controller
         $user = User::create(
             array('name' => request('name'), 'email' => request('email'), 'password' => $password)
         );
-        event(new Registered($user));
+
+        Auth::login($user);
+        if(!event(new Registered($user))){
+            return;
+        }
+
+        
         // $request->user()->sendEmailVerificationNotification();
         // return;
 
